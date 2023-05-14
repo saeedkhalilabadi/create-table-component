@@ -15,6 +15,7 @@ export default function TodoList({ data = mockData }: Props) {
     const newData = await ConvertDataForTable(params);
     setThisData(newData);
   }
+
   useEffect(() => {
     makeData(data);
   }, [data]);
