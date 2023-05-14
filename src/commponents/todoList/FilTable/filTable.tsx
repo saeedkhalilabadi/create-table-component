@@ -68,7 +68,8 @@ const fuzzySort: SortingFn<any> = (rowA, rowB, columnId) => {
   return dir === 0 ? sortingFns.alphanumeric(rowA, rowB, columnId) : dir;
 };
 
-export default function FilTable({ thisData }: any) {
+export default function FilTable({ thisData, config, searchText }: any) {
+  console.log(searchText);
   const rerender = React.useReducer(() => ({}), {})[1];
 
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -140,16 +141,15 @@ export default function FilTable({ thisData }: any) {
     }
   }, [table.getState().columnFilters[0]?.id]);
 
+
+  //setsearch text
+  React.useEffect(() => {
+    setGlobalFilter(String(searchText));
+  }, [searchText]);
+
   return (
     <div className="p-2">
-      <div>
-        <DebouncedInput
-          value={globalFilter ?? ""}
-          onChange={(value) => setGlobalFilter(String(value))}
-          className="p-2 font-lg shadow border border-block"
-          placeholder="Search all columns..."
-        />
-      </div>
+    
       <div className="h-2" />
       <table>
         <thead>
