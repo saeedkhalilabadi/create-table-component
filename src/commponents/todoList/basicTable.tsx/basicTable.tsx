@@ -33,7 +33,7 @@ const columns = [
 ];
 
 export default function BasicTable({ thisData }: any) {
-  console.log("this", thisData);
+ 
   const [data, setData] = React.useState(thisData);
   const rerender = React.useReducer(() => ({}), {})[1];
 
