@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { defaultConfig } from "./defaultConfig";
 
 import "./index.css";
 
@@ -68,8 +69,26 @@ const fuzzySort: SortingFn<any> = (rowA, rowB, columnId) => {
   return dir === 0 ? sortingFns.alphanumeric(rowA, rowB, columnId) : dir;
 };
 
-export default function FilTable({ thisData, config, searchText }: any) {
-  console.log(searchText);
+const getFeildTable = async (feilds: any) => {
+  const allFeilds: any = [];
+  await feilds?.map((feild: any) =>
+    allFeilds.push({
+      accessorFn: (row) => row[feild.name],
+      id: feild.name,
+      cell: (info) => info.getValue(),
+      footer: (props) => props.column.id,
+    })
+  );
+ 
+  return allFeilds;
+};
+
+export default function FilTable({
+  thisData,
+  config = defaultConfig,
+  searchText,
+}: any) {
+  console.log(config);
   const rerender = React.useReducer(() => ({}), {})[1];
 
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -78,26 +97,7 @@ export default function FilTable({ thisData, config, searchText }: any) {
   const [globalFilter, setGlobalFilter] = React.useState("");
 
   const columns = React.useMemo<ColumnDef<Person, any>[]>(
-    () => [
-      {
-        header: "Name",
-        footer: (props) => props.column.id,
-        columns: [
-          {
-            accessorKey: "title",
-            cell: (info) => info.getValue(),
-            footer: (props) => props.column.id,
-          },
-
-          {
-            accessorFn: (row) => row.type,
-            id: "type",
-            cell: (info) => info.getValue(),
-            footer: (props) => props.column.id,
-          },
-        ],
-      },
-    ],
+     getFeildTable(config?.feildList),
     []
   );
 
@@ -141,7 +141,6 @@ export default function FilTable({ thisData, config, searchText }: any) {
     }
   }, [table.getState().columnFilters[0]?.id]);
 
-
   //setsearch text
   React.useEffect(() => {
     setGlobalFilter(String(searchText));
@@ -149,7 +148,6 @@ export default function FilTable({ thisData, config, searchText }: any) {
 
   return (
     <div className="p-2">
-    
       <div className="h-2" />
       <table>
         <thead>
