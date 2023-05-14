@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { mockData } from "./data.js";
+import { mockData } from "./data.tsx";
 import BasicTable from "./basicTable.tsx/basicTable.js";
 import ConvertDataForTable from "./converDataForTable";
 import FilTable from "./FilTable/filTable.js";
