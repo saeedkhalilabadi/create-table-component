@@ -1,8 +1,10 @@
-import React from "react";
+import * as React from "react";
 import ReactDOM from "react-dom/client";
 import { defaultConfig } from "./defaultConfig";
 import TableHeader from "./tabelHeader";
 import FilterInput from "./filterInput";
+import CheckRowTable from "../CheckRowTable/index";
+import CellIcon from "../cellIcon/index";
 import "./index.css";
 
 import {
@@ -88,6 +90,8 @@ export default function Table({
           accessorKey: feild.name,
           cell: (info) => info.getValue(),
           footer: (props) => props.column.id,
+          ckeck: true,
+          icon: true,
         };
       })
     );
@@ -149,6 +153,8 @@ export default function Table({
     setGlobalFilter(String(searchText));
   }, [searchText]);
 
+  console.log(table.getRowModel().rows);
+
   return (
     <div className="p-2">
       <div className="h-2" />
@@ -183,10 +189,16 @@ export default function Table({
                             onClick: header.column.getToggleSortingHandler(),
                           }}
                         >
+                          {header.id === config?.feildList[index]?.name &&
+                            config?.feildList[index]?.check && (
+                              <CheckRowTable />
+                            )}
+                          {console.log("header", header)}
                           {flexRender(
                             header.column.columnDef.header,
                             header.getContext()
                           )}
+
                           {{
                             asc: " 🔼",
                             desc: " 🔽",
@@ -213,9 +225,12 @@ export default function Table({
           {table.getRowModel().rows.map((row) => {
             return (
               <tr key={row.id}>
-                {row.getVisibleCells().map((cell) => {
+                {row.getVisibleCells().map((cell, cellIndex) => {
                   return (
                     <td key={cell.id}>
+                      {console.log(config?.feildList[cellIndex]?.check)}
+                      {config?.feildList[cellIndex]?.check && <CheckRowTable />}
+                      {config?.feildList[cellIndex]?.icon && <CellIcon />}
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -229,50 +244,45 @@ export default function Table({
         </tbody>
       </table>
       <div />
-      <div className="pagination">
-        <button
-          className="border rounded p-1"
-          onClick={() => table.setPageIndex(0)}
-          disabled={!table.getCanPreviousPage()}
-        >
-          {"<<"}
-        </button>
-        <button
-          className="border rounded p-1"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          {"<"}
-        </button>
-        <span className="flex items-center gap-1">
-          <div>Page</div>
-          <strong>
-            {table.getState().pagination.pageIndex + 1} of{" "}
-            {table.getPageCount()}
-          </strong>
-        </span>
-        <button
-          className="border rounded p-1"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          {">"}
-        </button>
-        <button
-          className="border rounded p-1"
-          onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-          disabled={!table.getCanNextPage()}
-        >
-          {">>"}
-        </button>
-      </div>
-      <div>{table.getPrePaginationRowModel().rows.length} Rows</div>
-      <div>
-        <button onClick={() => rerender()}>Force Rerender</button>
-      </div>
-      <div>
-        <button onClick={() => refreshData()}>Refresh Data</button>
-      </div>
+      {table.getPageCount() < 2 ? null : (
+        <div className="pagination">
+          <button
+            className="border rounded p-1"
+            onClick={() => table.setPageIndex(0)}
+            disabled={!table.getCanPreviousPage()}
+          >
+            {"<<"}
+          </button>
+          <button
+            className="border rounded p-1"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            {"<"}
+          </button>
+          <span className="flex items-center gap-1">
+            <div>Page</div>
+            <strong>
+              {table.getState().pagination.pageIndex + 1} of{" "}
+              {table.getPageCount()}
+            </strong>
+          </span>
+          <button
+            className="border rounded p-1"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            {">"}
+          </button>
+          <button
+            className="border rounded p-1"
+            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+            disabled={!table.getCanNextPage()}
+          >
+            {">>"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

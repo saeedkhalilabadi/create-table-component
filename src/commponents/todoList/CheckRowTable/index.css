@@ -1,0 +1,11 @@
+.checkBox {
+  float: left;
+}
+.visible{
+    visibility: visible;
+
+}
+.hidden{
+    visibility: hidden;
+}
+

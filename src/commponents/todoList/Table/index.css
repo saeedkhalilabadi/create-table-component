@@ -19,6 +19,16 @@ th {
   color: rgb(180, 180, 180);
 }
 
+tr:nth-child(even) {
+  background-color: #ebebeb;
+}
+tr:hover {
+  background-color: rgb(194, 194, 194);
+}
+tr:hover .checkBox {
+  visibility: visible;
+}
+
 tfoot {
   color: gray;
 }
@@ -27,12 +37,11 @@ tfoot th {
   font-weight: normal;
 }
 .pagination {
-  max-width: 1200px;
+  max-width: 350px;
   display: grid;
   grid-template-columns: 0.5fr 0.5fr 1fr 0.5fr 0.5fr;
- 
+  margin: auto;
 }
-.selectPageSize{
-
+.selectPageSize {
   float: right;
 }
