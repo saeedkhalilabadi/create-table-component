@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { defaultConfig } from "./defaultConfig";
-
+import TableHeader from "./tabelHeader";
 import "./index.css";
 
 import {
@@ -81,6 +81,8 @@ export default function Table({
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [columnsList, setColumnsList] = React.useState([]);
+
+  console.log("config", config);
 
   React.useEffect(() => {
     setColumnsList(
@@ -162,7 +164,8 @@ export default function Table({
                   <th key={header.id} colSpan={header.colSpan}>
                     {header.isPlaceholder ? null : (
                       <>
-                        <div
+                        <TableHeader
+                          style={{ textAlign: config.headerPosition }}
                           {...{
                             className: header.column.getCanSort()
                               ? "cursor-pointer select-none"
@@ -178,7 +181,7 @@ export default function Table({
                             asc: " 🔼",
                             desc: " 🔽",
                           }[header.column.getIsSorted() as string] ?? null}
-                        </div>
+                        </TableHeader>
                         {header.column.getCanFilter() ? (
                           <div>
                             <Filter column={header.column} table={table} />
