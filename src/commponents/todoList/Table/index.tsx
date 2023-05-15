@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { defaultConfig } from "./defaultConfig";
 import TableHeader from "./tabelHeader";
+import FilterInput from "./filterInput";
 import "./index.css";
 
 import {
@@ -29,8 +30,6 @@ import {
   rankItem,
   compareItems,
 } from "@tanstack/match-sorter-utils";
-
-import { makeData, Person } from "./makeData";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -82,8 +81,6 @@ export default function Table({
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [columnsList, setColumnsList] = React.useState([]);
 
-  console.log("config", config);
-
   React.useEffect(() => {
     setColumnsList(
       config?.feildList?.map((feild: any) => {
@@ -99,7 +96,7 @@ export default function Table({
   const columns = React.useMemo<ColumnDef<Person, any>[]>(
     () => [
       {
-        header: "Name",
+        header: "test table",
         footer: (props) => props.column.id,
         columns: columnsList,
       },
@@ -155,11 +152,24 @@ export default function Table({
   return (
     <div className="p-2">
       <div className="h-2" />
+      <select
+        className="selectPageSize"
+        value={table.getState().pagination.pageSize}
+        onChange={(e) => {
+          table.setPageSize(Number(e.target.value));
+        }}
+      >
+        {[10, 20, 30, 40, 50].map((pageSize) => (
+          <option key={pageSize} value={pageSize}>
+            Show {pageSize}
+          </option>
+        ))}
+      </select>
       <table>
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
+              {headerGroup.headers.map((header, index) => {
                 return (
                   <th key={header.id} colSpan={header.colSpan}>
                     {header.isPlaceholder ? null : (
@@ -184,7 +194,11 @@ export default function Table({
                         </TableHeader>
                         {header.column.getCanFilter() ? (
                           <div>
-                            <Filter column={header.column} table={table} />
+                            <Filter
+                              type={config?.feildList[index]?.type}
+                              column={header.column}
+                              table={table}
+                            />
                           </div>
                         ) : null}
                       </>
@@ -214,8 +228,8 @@ export default function Table({
           })}
         </tbody>
       </table>
-      <div className="h-2" />
-      <div className="flex items-center gap-2">
+      <div />
+      <div className="pagination">
         <button
           className="border rounded p-1"
           onClick={() => table.setPageIndex(0)}
@@ -230,6 +244,13 @@ export default function Table({
         >
           {"<"}
         </button>
+        <span className="flex items-center gap-1">
+          <div>Page</div>
+          <strong>
+            {table.getState().pagination.pageIndex + 1} of{" "}
+            {table.getPageCount()}
+          </strong>
+        </span>
         <button
           className="border rounded p-1"
           onClick={() => table.nextPage()}
@@ -244,37 +265,6 @@ export default function Table({
         >
           {">>"}
         </button>
-        <span className="flex items-center gap-1">
-          <div>Page</div>
-          <strong>
-            {table.getState().pagination.pageIndex + 1} of{" "}
-            {table.getPageCount()}
-          </strong>
-        </span>
-        <span className="flex items-center gap-1">
-          | Go to page:
-          <input
-            type="number"
-            defaultValue={table.getState().pagination.pageIndex + 1}
-            onChange={(e) => {
-              const page = e.target.value ? Number(e.target.value) - 1 : 0;
-              table.setPageIndex(page);
-            }}
-            className="border p-1 rounded w-16"
-          />
-        </span>
-        <select
-          value={table.getState().pagination.pageSize}
-          onChange={(e) => {
-            table.setPageSize(Number(e.target.value));
-          }}
-        >
-          {[10, 20, 30, 40, 50].map((pageSize) => (
-            <option key={pageSize} value={pageSize}>
-              Show {pageSize}
-            </option>
-          ))}
-        </select>
       </div>
       <div>{table.getPrePaginationRowModel().rows.length} Rows</div>
       <div>
@@ -288,9 +278,11 @@ export default function Table({
 }
 
 function Filter({
+  type,
   column,
   table,
 }: {
+  type: "text" | "number" | "date" | "list";
   column: Column<any, unknown>;
   table: thisTable<any>;
 }) {
@@ -311,8 +303,9 @@ function Filter({
   return typeof firstValue === "number" ? (
     <div>
       <div className="flex space-x-2">
-        <DebouncedInput
-          type="number"
+        <FilterInput
+          type={type}
+          debounce={500}
           min={Number(column.getFacetedMinMaxValues()?.[0] ?? "")}
           max={Number(column.getFacetedMinMaxValues()?.[1] ?? "")}
           value={(columnFilterValue as [number, number])?.[0] ?? ""}
@@ -326,8 +319,9 @@ function Filter({
           }`}
           className="w-24 border shadow rounded"
         />
-        <DebouncedInput
-          type="number"
+        <FilterInput
+          debounce={500}
+          type={type}
           min={Number(column.getFacetedMinMaxValues()?.[0] ?? "")}
           max={Number(column.getFacetedMinMaxValues()?.[1] ?? "")}
           value={(columnFilterValue as [number, number])?.[1] ?? ""}
@@ -346,13 +340,16 @@ function Filter({
     </div>
   ) : (
     <>
-      <datalist id={column.id + "list"}>
-        {sortedUniqueValues.slice(0, 5000).map((value: any) => (
-          <option value={value} key={value} />
-        ))}
-      </datalist>
-      <DebouncedInput
-        type="text"
+      {type === "list" && (
+        <datalist id={column.id + "list"}>
+          {sortedUniqueValues.slice(0, 5000).map((value: any) => (
+            <option value={value} key={value} />
+          ))}
+        </datalist>
+      )}
+      <FilterInput
+        debounce={500}
+        type={type}
         value={(columnFilterValue ?? "") as string}
         onChange={(value) => column.setFilterValue(value)}
         placeholder={`Search... (${column.getFacetedUniqueValues().size})`}
@@ -361,39 +358,5 @@ function Filter({
       />
       <div className="h-1" />
     </>
-  );
-}
-
-// A debounced input react component
-function DebouncedInput({
-  value: initialValue,
-  onChange,
-  debounce = 500,
-  ...props
-}: {
-  value: string | number;
-  onChange: (value: string | number) => void;
-  debounce?: number;
-} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange">) {
-  const [value, setValue] = React.useState(initialValue);
-
-  React.useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
-
-  React.useEffect(() => {
-    const timeout = setTimeout(() => {
-      onChange(value);
-    }, debounce);
-
-    return () => clearTimeout(timeout);
-  }, [value]);
-
-  return (
-    <input
-      {...props}
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-    />
   );
 }

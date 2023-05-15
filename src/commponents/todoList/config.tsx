@@ -1,15 +1,12 @@
 
-//field-type:string||number||date
+//field-type:text|number|date|list
 
 
 
 export const config={
-
-
 feildList:[
-    {name:'title',type:'string'},
-    {name:'type',type:'string'},
+    {name:'title',type:'text'},
+    {name:'type',type:'text'},
 ],
 headerPosition:'left',//'right'||'center'||'left'
-
 }

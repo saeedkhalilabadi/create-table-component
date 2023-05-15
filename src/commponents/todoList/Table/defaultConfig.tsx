@@ -1,7 +1,7 @@
 export const defaultConfig = {
     feildList: [
-      { name: "title", type: "string" },
-      { name: "type", type: "string" },
+      { name: "title", type: "text" },
+      { name: "type", type: "number" },
     ],
     headerPosition: "left", //'right'||'center','left'
   };

@@ -4,8 +4,9 @@ import { config } from "./config.tsx";
 
 import BasicTable from "./basicTable.tsx/basicTable.js";
 import ConvertDataForTable from "./converDataForTable";
-import Table from "./table/table.tsx";
-import Input from "./input/index";
+import Table from "./table";
+import Input from "./input";
+import FilterInput from "./Table/filterInput";
 
 type Props = {
   data: Array<any>;
@@ -39,5 +40,5 @@ export default function TodoList({ data = mockData }: Props) {
       <Table thisData={thisData} config={config} searchText={searchText} />;
     </>
   );
-  return <BasicTable thisData={thisData} />;
+ 
 }
