@@ -6,7 +6,7 @@ import "./index.css";
 
 import {
   Column,
-  Table,
+  Table as thisTable,
   useReactTable,
   ColumnFiltersState,
   getCoreRowModel,
@@ -69,7 +69,7 @@ const fuzzySort: SortingFn<any> = (rowA, rowB, columnId) => {
   return dir === 0 ? sortingFns.alphanumeric(rowA, rowB, columnId) : dir;
 };
 
-export default function FilTable({
+export default function Table({
   thisData,
   config = defaultConfig,
   searchText,
@@ -289,7 +289,7 @@ function Filter({
   table,
 }: {
   column: Column<any, unknown>;
-  table: Table<any>;
+  table: thisTable<any>;
 }) {
   const firstValue = table
     .getPreFilteredRowModel()

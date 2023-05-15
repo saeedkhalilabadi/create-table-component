@@ -4,7 +4,7 @@ import { config } from "./config.tsx";
 
 import BasicTable from "./basicTable.tsx/basicTable.js";
 import ConvertDataForTable from "./converDataForTable";
-import FilTable from "./FilTable/filTable.js";
+import Table from "./table/table.tsx";
 import Input from "./input/index";
 
 type Props = {
@@ -36,7 +36,7 @@ export default function TodoList({ data = mockData }: Props) {
         onChange={handelSerchText}
         value={searchText}
       />
-      <FilTable thisData={thisData} config={config} searchText={searchText} />;
+      <Table thisData={thisData} config={config} searchText={searchText} />;
     </>
   );
   return <BasicTable thisData={thisData} />;
