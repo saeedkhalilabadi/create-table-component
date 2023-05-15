@@ -69,36 +69,40 @@ const fuzzySort: SortingFn<any> = (rowA, rowB, columnId) => {
   return dir === 0 ? sortingFns.alphanumeric(rowA, rowB, columnId) : dir;
 };
 
-const getFeildTable = async (feilds: any) => {
-  const allFeilds: any = [];
-  await feilds?.map((feild: any) =>
-    allFeilds.push({
-      accessorFn: (row) => row[feild.name],
-      id: feild.name,
-      cell: (info) => info.getValue(),
-      footer: (props) => props.column.id,
-    })
-  );
- 
-  return allFeilds;
-};
-
 export default function FilTable({
   thisData,
   config = defaultConfig,
   searchText,
 }: any) {
-  console.log(config);
   const rerender = React.useReducer(() => ({}), {})[1];
 
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
+  const [columnsList, setColumnsList] = React.useState([]);
+
+  React.useEffect(() => {
+    setColumnsList(
+      config?.feildList?.map((feild: any) => {
+        return {
+          accessorKey: feild.name,
+          cell: (info) => info.getValue(),
+          footer: (props) => props.column.id,
+        };
+      })
+    );
+  }, [config]);
 
   const columns = React.useMemo<ColumnDef<Person, any>[]>(
-     getFeildTable(config?.feildList),
-    []
+    () => [
+      {
+        header: "Name",
+        footer: (props) => props.column.id,
+        columns: columnsList,
+      },
+    ],
+    [columnsList]
   );
 
   const [data, setData] = React.useState<Person[]>(thisData);
